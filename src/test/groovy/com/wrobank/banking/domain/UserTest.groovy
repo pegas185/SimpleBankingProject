@@ -1,29 +1,43 @@
 package com.wrobank.banking.domain
 
-import spock.lang.PendingFeature
+import com.wrobank.banking.SimpleBankingProjectApplication
+import com.wrobank.banking.user.domain.User
+import com.wrobank.banking.user.services.UserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Specification
 
 import java.lang.Void as Should
 
+@SpringBootTest(classes = SimpleBankingProjectApplication)
+@DirtiesContext
 class UserTest extends Specification {
 
-    @PendingFeature
-    Should "authenticate user by valid credentials"() {
-        given: "I'm a valid user and I provide the valid credentials"
+    @Autowired
+    UserService userService
 
-        when: "I login to the system"
+    Should "find user by valid username"() {
+        given: "I'm a user viewer and I provide the valid username"
+        String valid_username = 'user1'
 
-        then: "I should be granted with access to the system"
-        false
+        when: "I query users by the username"
+        User user = userService.findUserByUsername(valid_username)
+
+
+        then: "I should have a valid user"
+        user.id != null
+        user.username != null
     }
 
-    @PendingFeature
-    Should "not authenticate user by invalid credentials"() {
-        given: "I'm a user and I provide the invalid credentials"
+    Should "I should not see any users by an invalid username"() {
+        given: "I'm a user viewer and I provide the invalid username"
+        String invalid_username = 'invalid'
 
-        when: "I login to the system"
+        when: "I query users by the username"
+        User user = userService.findUserByUsername(invalid_username)
 
-        then: "I should not be able to login to the system and have an authentication error"
-        false
+        then: "I should not see any user"
+        user == null
     }
 }
