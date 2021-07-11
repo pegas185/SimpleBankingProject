@@ -1,4 +1,4 @@
-package com.wrobank.banking.domain;
+package com.wrobank.banking.transaction.domain;
 
 public enum TransactionType {
     INBOUND,

@@ -6,8 +6,8 @@ import spock.lang.Title
 
 import java.lang.Void as Should
 
-import static com.wrobank.banking.domain.TransactionType.INBOUND
-import static com.wrobank.banking.domain.TransactionType.OUTBOUND
+import static com.wrobank.banking.transaction.domain.TransactionType.INBOUND
+import static com.wrobank.banking.transaction.domain.TransactionType.OUTBOUND
 
 @Title("Customer domain should")
 class AccountTest extends Specification {
