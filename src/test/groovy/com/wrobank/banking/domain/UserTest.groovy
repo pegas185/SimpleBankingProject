@@ -1,6 +1,7 @@
 package com.wrobank.banking.domain
 
 import com.wrobank.banking.SimpleBankingProjectApplication
+import com.wrobank.banking.common.domain.UserWasNotFoundException
 import com.wrobank.banking.user.domain.User
 import com.wrobank.banking.user.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +38,7 @@ class UserTest extends Specification {
         when: "I query users by the username"
         User user = userService.findUserByUsername(invalid_username)
 
-        then: "I should not see any user"
-        user == null
+        then: "I should get user not found exception"
+        thrown(UserWasNotFoundException)
     }
 }
