@@ -22,6 +22,6 @@ CREATE TABLE transaction
     id IDENTITY NOT NULL PRIMARY KEY,
     account_id INTEGER NOT NULL,
     transaction_type SMALLINT NOT NULL,
-    amount DECIMAL NOT NULL
+    amount DECIMAL(20,2) NOT NULL
 
 );

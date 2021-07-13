@@ -8,6 +8,7 @@ import com.wrobank.banking.account.services.AccountService
 import com.wrobank.banking.transaction.repositories.TransactionRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Specification
 
@@ -39,9 +40,6 @@ class AccountTest extends Specification {
         !result.isEmpty()
         result[0].customerId == customerId
         result[0].id != null
-
-        cleanup:
-        accountRepository.deleteById(account.id)
     }
 
     Should "get an empty list by an ID of a missing customer"() {
@@ -56,9 +54,6 @@ class AccountTest extends Specification {
 
         then: "I should get an empty list of accounts"
         result.isEmpty()
-
-        cleanup:
-        accountRepository.deleteById(account.id)
     }
 
     Should "have a new account created for a valid customer ID and no credit available"() {
@@ -75,9 +70,6 @@ class AccountTest extends Specification {
         result[0].customerId == customerId
         result[0].id != null
         transactionRepository.findAllByAccountId(result[0].id).isEmpty()
-
-        cleanup:
-        accountRepository.deleteById(result[0].id)
     }
 
     Should "have a new account created for a valid customer ID and an available credit: #credit"() {
@@ -97,14 +89,34 @@ class AccountTest extends Specification {
         transaction.amount == amount
         transaction.transactionType == transactionType
 
-        cleanup:
-        accountRepository.deleteById(result[0].id)
-        transactionRepository.findAllByAccountId(result[0].id).each(transactionRepository.&delete)
-
         where:
         credit | transactionType | amount
         5      | INBOUND         | 5
         -5     | OUTBOUND        | 5
+    }
+
+    Should "have no account created for a valid customer ID and an invalid credit: #credit"() {
+        given: "As a account manager I have the valid customerId and the available credit"
+        def customerId = 103
+        CreateNewAccountCommand command = provideTestNewAccountCommand(customerId, credit)
+
+        when: "I command to create a new account for customer"
+        accountService.processNewAccountCommand(command)
+        List<Account> result = accountService.findAllAccountsFor(customerId)
+
+        then: "the new account should be created with a transaction for the available credit"
+        thrown(DbActionExecutionException)
+        result == null
+
+        where:
+        credit                            || _
+        5000000000000000000000000000.999  || _
+        -5000000000000000000000000000.999 || _
+    }
+
+    void cleanup() {
+        accountRepository.deleteAll()
+        transactionRepository.deleteAll()
     }
 
     Account provideTestAccount(Integer customerId) {
