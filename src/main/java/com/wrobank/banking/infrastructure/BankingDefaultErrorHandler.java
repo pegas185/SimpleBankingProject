@@ -3,6 +3,7 @@ package com.wrobank.banking.infrastructure;
 import com.wrobank.banking.common.domain.CustomerWasNotFoundException;
 import com.wrobank.banking.common.domain.ErrorResult;
 import com.wrobank.banking.common.domain.UserWasNotFoundException;
+import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,12 +39,22 @@ public class BankingDefaultErrorHandler {
         return produceBadRequestResult(ex);
     }
 
+    @ExceptionHandler(DbActionExecutionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResult handleCustomException(DbActionExecutionException ex) {
+        return produceServerErrorResult(ex);
+    }
+
     private ErrorResult produceNotFoundResult(Exception ex) {
         return produceErrorResult(HttpStatus.NOT_FOUND, ex);
     }
 
     private ErrorResult produceBadRequestResult(Exception ex) {
         return produceErrorResult(HttpStatus.BAD_REQUEST, ex);
+    }
+
+    private ErrorResult produceServerErrorResult(Exception ex) {
+        return produceErrorResult(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
     private ErrorResult produceErrorResult(HttpStatus status, Exception ex) {
