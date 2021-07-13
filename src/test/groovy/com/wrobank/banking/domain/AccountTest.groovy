@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 import java.lang.Void as Should
@@ -20,7 +19,6 @@ import static com.wrobank.banking.transaction.domain.TransactionType.OUTBOUND
 
 @SpringBootTest(classes = SimpleBankingProjectApplication)
 @DirtiesContext
-@ActiveProfiles("test")
 class AccountTest extends Specification {
 
     @Autowired

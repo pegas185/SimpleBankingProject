@@ -35,9 +35,6 @@ class TransactionTest extends Specification {
 
         then: "I should receive transactions associated with the accountId"
         result.contains(transaction)
-
-        cleanup:
-        transactionRepository.deleteById(transaction.id)
     }
 
     Should "get an empty list of transactions by an ID of a missing account"() {
@@ -52,9 +49,6 @@ class TransactionTest extends Specification {
 
         then: "I should get invalid argument exception"
         result.isEmpty()
-
-        cleanup:
-        transactionRepository.deleteById(transaction.id)
     }
 
     Should "have a new transaction created for a valid account ID and an available credit #credit"() {
@@ -72,13 +66,14 @@ class TransactionTest extends Specification {
         results[0].transactionType == transactionType
         results[0].amount == amount
 
-        cleanup:
-        transactionRepository.findAllByAccountId(accountId).each(transactionRepository.&delete)
-
         where:
         credit | transactionType | amount
         5      | INBOUND         | 5
         -5     | OUTBOUND        | 5
+    }
+
+    void cleanup() {
+        transactionRepository.deleteAll()
     }
 
     private Transaction provideTestTransaction(accountId = 1, BigDecimal amount = 10) {
